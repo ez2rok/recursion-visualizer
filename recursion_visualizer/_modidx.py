@@ -5,4 +5,12 @@ d = { 'settings': { 'branch': 'master',
                 'doc_host': 'https://ez2rok.github.io',
                 'git_url': 'https://github.com/ez2rok/recursion-visualizer',
                 'lib_path': 'recursion_visualizer'},
-  'syms': {'recursion_visualizer.core': {'recursion_visualizer.core.foo': ('core.html#foo', 'recursion_visualizer/core.py')}}}
+  'syms': { 'recursion_visualizer.core': {'recursion_visualizer.core.foo': ('core.html#foo', 'recursion_visualizer/core.py')},
+            'recursion_visualizer.node': { 'recursion_visualizer.node.Node': ('node.html#node', 'recursion_visualizer/node.py'),
+                                           'recursion_visualizer.node.Node.__eq__': ('node.html#__eq__', 'recursion_visualizer/node.py'),
+                                           'recursion_visualizer.node.Node.__init__': ( 'node.html#__init__',
+                                                                                        'recursion_visualizer/node.py'),
+                                           'recursion_visualizer.node.Node.__repr__': ( 'node.html#__repr__',
+                                                                                        'recursion_visualizer/node.py'),
+                                           'recursion_visualizer.node.Node.__str__': ( 'node.html#__str__',
+                                                                                       'recursion_visualizer/node.py')}}}
