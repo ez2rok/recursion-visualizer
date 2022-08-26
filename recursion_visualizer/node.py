@@ -3,14 +3,14 @@
 # %% auto 0
 __all__ = ['Node']
 
-# %% ../00_node.ipynb 3
+# %% ../00_node.ipynb 4
 class Node:
     "A node"
     def __init__(self, 
                  my_id: int, # a unique id for the node
                  input:tuple = None, # the input to the function represented by the node
                  output:any = None, # the output of the function represented by the node
-                 depth: int = None, # the depth of the node in the graph
+                 depth: int = None, # the depth of the node in the graph (starting at 0)
                  discovery:int = None, # the time the node was first discovered in the graph traversal
                  finish: int = None,): # the time the node (and its descendants) were finished being explored in the graph traversal
         self.id = my_id
@@ -21,7 +21,7 @@ class Node:
         self.finish = finish
         
     def __repr__(self):
-        return '<Node {}> f{}={}'.format(self.id, self.input, self.output)
+        return '<Node {}> f({})={} d={}, f={}'.format(self.id, self.input, self.output, self.discovered, self.finish)
     
     def __str__(self):
         return self.__repr__()

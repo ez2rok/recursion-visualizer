@@ -3,3 +3,4 @@ website:
     contents:
       - index.ipynb
       - 00_node.ipynb
+      - 01_recurse.ipynb
