@@ -3,17 +3,25 @@
 # %% auto 0
 __all__ = ['Node']
 
-# %% ../00_node.ipynb 4
+# %% ../00_node.ipynb 3
+from fastcore.test import *
+
+# %% ../00_node.ipynb 5
 class Node:
     "A node"
+    
+    # explicitly state which instance attributes `Node` will have to get faster attribute access and space savings in memory
+    # more here: https://stackoverflow.com/questions/472000/usage-of-slots
+    __slots__ = ['id_', 'input', 'output', 'depth', 'discovered', 'finish']
+    
     def __init__(self, 
-                 my_id: int, # a unique id for the node
+                 id_: int = None, # a unique id for the node
                  input:tuple = None, # the input to the function represented by the node
                  output:any = None, # the output of the function represented by the node
                  depth: int = None, # the depth of the node in the graph (starting at 0)
                  discovery:int = None, # the time the node was first discovered in the graph traversal
                  finish: int = None,): # the time the node (and its descendants) were finished being explored in the graph traversal
-        self.id = my_id
+        self.id_ = id_
         self.input = input
         self.output = output
         self.depth = depth
@@ -21,10 +29,10 @@ class Node:
         self.finish = finish
         
     def __repr__(self):
-        return '<Node {}> f({})={} d={}, f={}'.format(self.id, self.input, self.output, self.discovered, self.finish)
+        return '<Node {}> f{}={} d={}, f={}'.format(self.id_, self.input, self.output, self.discovered, self.finish)
     
     def __str__(self):
         return self.__repr__()
     
     def __eq__(self, other:'Node'):
-        return type(self) == type(other) and self.id == other.id   
+        return type(self) == type(other) and self.id_ == other.id_
