@@ -4,7 +4,7 @@
 __all__ = ['get_preorder_traversal', 'get_graph_edges', 'get_graph']
 
 # %% ../02_graph.ipynb 4
-from .node import Node 
+from .node import Node
 
 # %% ../02_graph.ipynb 5
 import networkx as nx
