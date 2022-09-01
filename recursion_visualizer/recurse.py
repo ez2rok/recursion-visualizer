@@ -5,12 +5,11 @@ __all__ = ['RecursionVisualizer']
 
 # %% ../01_recurse.ipynb 3
 from .node import Node 
-from .animate import get_edges
+from .graph import get_graph
 
 # %% ../01_recurse.ipynb 5
 class RecursionVisualizer:
-  """A class that provides a decorator for visualizing recursion trees and caching results.
-  """
+  """A class that provides a decorator for visualizing recursion trees and caching results."""
 
   def __init__(self,
                verbose: bool = False, # if true, print all nodes
@@ -31,13 +30,13 @@ class RecursionVisualizer:
     self.history = element i was discovered or finished at time i
     self.pos = position of vertices in animate
     """
-    self.nodes, self.edge_labels, self.history = {}, {}, []
+    self.nodes, self.node_to_edge_labels, self.history = {}, {}, []
     self.id, self.time, self.depth = 0, 0, 0
     self.cache = {}
     self.func_name = ''
 
-  def _animate(self, nodes, history, edge_labels, func_name):
-    edge_to_label = get_edges(nodes, history, edge_labels)
+  def _animate(self, history, nodes, node_to_edge_labels, func_name):
+    DG = get_graph(history, nodes, node_to_edge_labels)
 
     # # create recursion tree animation
     # fig = animate(history, nodes, func_name)
@@ -103,7 +102,7 @@ class RecursionVisualizer:
       self.nodes[id_].output = self.cache[args]
       self.nodes[id_].finish = self.time
       
-      self.edge_labels[id_] = kwargs['edge_label'] if kwargs and 'edge_label' in kwargs else ''
+      self.node_to_edge_labels[id_] = kwargs['edge_label'] if kwargs and 'edge_label' in kwargs else ''
       self.history.append(node.id_)
       self.time += 1
 
@@ -112,7 +111,7 @@ class RecursionVisualizer:
 
       # animate after done traversing through the entire tree
       if self.animate and self.depth == 0:
-        self._animate(self.nodes, self.history, self.edge_labels, func.__name__)
+        self._animate(self.history, self.nodes, self.node_to_edge_labels, func.__name__)
 
       return self.cache[args]
     return memoized_func

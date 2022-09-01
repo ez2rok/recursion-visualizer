@@ -3,10 +3,10 @@
 # %% auto 0
 __all__ = ['Node']
 
-# %% ../00_node.ipynb 3
-from fastcore.test import *
+# %% ../00_node.ipynb 4
+from fastcore.test import * 
 
-# %% ../00_node.ipynb 5
+# %% ../00_node.ipynb 6
 class Node:
     "A node"
     
