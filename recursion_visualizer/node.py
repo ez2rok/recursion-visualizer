@@ -19,13 +19,13 @@ class Node:
                  input:tuple = None, # the input to the function represented by the node
                  output:any = None, # the output of the function represented by the node
                  depth: int = None, # the depth of the node in the graph (starting at 0)
-                 discovery:int = None, # the time the node was first discovered in the graph traversal
+                 discovered:int = None, # the time the node was first discovered in the graph traversal
                  finish: int = None,): # the time the node (and its descendants) were finished being explored in the graph traversal
         self.id_ = id_
         self.input = input
         self.output = output
         self.depth = depth
-        self.discovered = discovery
+        self.discovered = discovered
         self.finish = finish
         
     def __repr__(self):
