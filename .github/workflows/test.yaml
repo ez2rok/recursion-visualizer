@@ -6,6 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - name: install
-        run: sudo apt-get update; sudo apt-get install graphviz-dev
+        run: sudo apt-get update; sudo apt-get install graphviz-dev; pip install pygraphviz
       - name: test
         uses: fastai/workflows/nbdev-ci@master
