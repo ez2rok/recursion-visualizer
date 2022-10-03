@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "recursion-visualizer"
+  site-url: "https://ez2rok.github.io/recursion-visualizer"
+  description: "Visualize recursive functions with beautiful animations"
+  repo-branch: master
+  repo-url: "https://github.com/ez2rok/recursion-visualizer"
