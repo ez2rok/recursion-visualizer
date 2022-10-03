@@ -10,10 +10,6 @@ from fastcore.test import *
 class Node:
     "A node"
     
-    # explicitly state which instance attributes `Node` will have to get faster attribute access and space savings in memory
-    # more here: https://stackoverflow.com/questions/472000/usage-of-slots
-    __slots__ = ['id_', 'input', 'output', 'depth', 'discovered', 'finish']
-    
     def __init__(self, 
                  id_: int = None, # a unique id for the node
                  input:tuple = None, # the input to the function represented by the node

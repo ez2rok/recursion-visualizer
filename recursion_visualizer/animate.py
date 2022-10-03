@@ -2,10 +2,11 @@
 
 # %% auto 0
 __all__ = ['get_node_and_edge_coordinates', 'get_node_text', 'get_edge_text', 'get_link_annotation', 'get_title', 'get_slider',
-           'update_slider', 'get_play_pause_buttons', 'get_axis_settings', 'animate']
+           'update_slider', 'get_play_pause_buttons', 'get_axis_settings', 'animate', 'Memoize', 'on_colab']
 
 # %% ../02_animate.ipynb 2
-from .node import Node
+from .node import Node 
+from .graph import get_graph
 
 # %% ../02_animate.ipynb 3
 import networkx as nx
@@ -131,43 +132,43 @@ def get_title(
 
 # %% ../02_animate.ipynb 12
 def get_slider() -> dict: # slider to control the animation
-    """Return the slider that allows the user to control the animation"""
+  """Return the slider that allows the user to control the animation"""
     
-    return {
-        "active": 0,
-        "yanchor": "top",
-        "xanchor": "left",
-        "currentvalue": {
-            "font": {"size": 20},
-            "prefix": "Time:",
-            "visible": True,
-            "xanchor": "right"
-        },
-        "transition": {"duration": 300, "easing": "cubic-in-out"},
-        "pad": {"b": 5, "t": 5},
-        "len": 0.9,
-        "x": 0.1,
-        "y": 0,
-        "steps": []
-    }
+  return {
+      "active": 0,
+      "yanchor": "top",
+      "xanchor": "left",
+      "currentvalue": {
+          "font": {"size": 20},
+          "prefix": "Time:",
+          "visible": True,
+          "xanchor": "right"
+      },
+      "transition": {"duration": 300, "easing": "cubic-in-out"},
+      "pad": {"b": 5, "t": 5},
+      "len": 0.9,
+      "x": 0.1,
+      "y": 0,
+      "steps": []
+  }
 
 # %% ../02_animate.ipynb 13
 def update_slider(
-    slider: dict, # slider that allows the user to control the animation 
-    time: int, # current time
-    ) -> dict: # updated slider
-    """Update the slider with the current time"""
+  slider: dict, # slider that allows the user to control the animation 
+  time: int, # current time
+  ) -> dict: # updated slider
+  """Update the slider with the current time"""
     
-    slider_step = {
-        "args": [[time],
-                {"frame": {"duration": 300, "redraw": False},
-                    "mode": "immediate",
-                    "transition": {"duration": 300}}
-                ],
-                "label": time,
-                    "method": "animate"
-                    }
-    slider["steps"].append(slider_step)
+  slider_step = {
+      "args": [[time],
+               {"frame": {"duration": 300, "redraw": False},
+                "mode": "immediate",
+                "transition": {"duration": 300}}
+               ],
+               "label": time,
+                "method": "animate"
+                }
+  slider["steps"].append(slider_step)
 
 # %% ../02_animate.ipynb 14
 def get_play_pause_buttons() -> List[dict]: # play/pause buttons
@@ -179,44 +180,44 @@ def get_play_pause_buttons() -> List[dict]: # play/pause buttons
        tutorial](https://plotly.com/python/animations/#using-a-slider-and-buttons)
     """
     return [
-        {"buttons":
-            [{"args": [None, {"frame": {"duration": 500, "redraw": False},
-                              "fromcurrent": True,
-                              "transition": {"duration": 300, "easing": "quadratic-in-out"}
-                              }
-                       ],
-              "label": "Play",
-              "method": "animate"
-              },
-             {"args": [[None], {"frame": {"duration": 0, "redraw": False},
-                                "mode": "immediate",
-                                "transition": {"duration": 0}
-                                }
-                        ],
-              "label": "Pause",
-              "method": "animate"
-              }
-             ],
-            "direction": "up",
-            "pad": {"r": 20, "t": 15},
-            "showactive": True,
-            "type": "buttons",
-            "x": 0.1,
-            "xanchor": "right",
-            "y": 0,
-            "yanchor": "top"
-            }
-        ]
+    {"buttons": 
+     [{"args": [None, {"frame": {"duration": 500, "redraw": False},
+                       "fromcurrent": True, 
+                       "transition": {"duration": 300, "easing": "quadratic-in-out"}
+                       }
+                ],
+       "label": "Play",
+       "method": "animate"
+       },
+      {"args": [[None], {"frame": {"duration": 0, "redraw": False},
+                         "mode": "immediate",
+                         "transition": {"duration": 0}
+                         }
+                ],
+       "label": "Pause",
+       "method": "animate"
+       }
+      ],
+     "direction": "up",
+     "pad": {"r": 20, "t": 15},
+     "showactive": True,
+     "type": "buttons",
+     "x": 0.1,
+     "xanchor": "right",
+     "y": 0,
+     "yanchor": "top"
+     }
+     ]
 
 # %% ../02_animate.ipynb 15
 def get_axis_settings() -> dict: # axis settings
-    """Return the axis settings"""
-    
-    return dict(showline=False,
-                zeroline=False,
-                showgrid=False,
-                showticklabels=False
-                )
+  """Return the axis settings"""
+  
+  return dict(showline=False,
+              zeroline=False,
+              showgrid=False,
+              showticklabels=False
+              )
 
 # %% ../02_animate.ipynb 17
 def animate(history,nodes,
@@ -225,84 +226,221 @@ def animate(history,nodes,
             edge_to_label
             ):
   
+  # get node and edge coordinates
+  node_x, node_y, edge_x, edge_y = get_node_and_edge_coordinates(DG)
+  
+  # get text to be displayed on the nodes, edges, and figure
+  max_node_length, node_annotations, hovertext = get_node_text(nodes, func_name)
+  edge_annotations = get_edge_text(node_x, node_y, edge_to_label)
+  link_annotation = get_link_annotation()
+  title = get_title(nodes, func_name)
+  
+  # get graphics
+  slider = get_slider()
+  axis_settings = get_axis_settings()
+  buttons = get_play_pause_buttons()
 
-    # node and edge coordinates
-    node_x, node_y, edge_x, edge_y = get_node_and_edge_coordinates(DG)
-    
-    # get text to be displayed
-    max_node_length, node_annotations, hovertext = get_node_text(nodes, func_name)
-    edge_annotations = get_edge_text(node_x, node_y, edge_to_label)
-    link_annotation = get_link_annotation()
-    title = get_title(nodes, func_name)
-    
-    # get graphics
-    slider = get_slider()
-    axis_settings = get_axis_settings()
-    buttons = get_play_pause_buttons()
-    
-    
-    # keep track of the visit status of each node at each time step:
-    #   0 -> unvisited
-    #   1 -> visiting
-    #   2 -> visited
-    # This is used to color the node circles and the node text.
-    visit_to_text_color =  {0: 'rgb(0,0,0)', 1: 'rgb(255, 255, 255)', 2: 'rgb(255, 255, 255)'}
-    visit = [0] * len(nodes)
-    node_text_color = [visit_to_text_color[visit[id_]] for id_ in nodes.keys()]
+  # keep track of the visit status of each node at each time step:
+  #   0 -> unvisited
+  #   1 -> visiting
+  #   2 -> visited
+  # This is used to color the node circles and the node text.
+  visit = [0] * len(nodes)
+  visit_to_text_color =  {0: 'rgb(0,0,0)', 1: 'rgb(255, 255, 255)', 2: 'rgb(255, 255, 255)'}
+  node_text_color = [visit_to_text_color[visit[id_]] for id_ in nodes.keys()]
 
-    # get frames
-    frames = []
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
-    for time, node_id in enumerate(history):
+  # get frames
+  frames = []
+  fig = make_subplots(specs=[[{"secondary_y": True}]])
+  for time, node_id in enumerate([None] + history):
+    
+    # update visit status, node text color, and circle color
+    # Note: circle color is determined by `visit`` so by updating `visit`, we've updated circle color
+    if node_id != None:
+      visit[node_id] += 1
+      node_text_color[node_id] = visit_to_text_color[visit[node_id]]
+
+    # plot nodes
+    node_trace = go.Scatter(
+        x=node_x, y=node_y,
+        mode='markers+text',
+        hovertext=hovertext,
+        hoverinfo='text',
+        text=node_annotations,
+        #textfont={'color': node_annotation_colors[time]},
+        textfont={'color': node_text_color},
+        marker={'line': dict(color='rgb(50,50,50)', width=1),
+                'color': visit,
+                'cmid': 1,
+                'colorscale': [(0.00, '#F7FBFF'), (0.33, '#F7FBFF'),
+                               (0.33, '#6AAED6'), (0.66, '#6AAED6'),
+                               (0.66, '#0A306B'), (1.00, '#0A306B')
+                               ], # colors taken from px.colors.sequential.Blues
+                'size': 10 + 7*max_node_length},
+        showlegend=False,
+        ids=list(nodes.keys())
+        )
+    
+    # plot edges
+    edge_trace = go.Scatter(
+        x=edge_x, y=edge_y,
+        line=dict(width=1, color='#888'),
+        hoverinfo='none',
+        mode='lines',
+        showlegend=False,
+        textposition="bottom right"
+        )
+    
+    # updates frames and slider
+    frame = go.Frame(data=[node_trace, edge_trace], name=str(time))
+    frames.append(frame)
+    update_slider(slider, time)
+
+  # create layout
+  layout = go.Layout(
+      title=title,
+      xaxis=axis_settings,
+      yaxis=axis_settings,
+      annotations=link_annotation+edge_annotations,
+      margin=dict(b=0,l=5,r=5,t=5),
+      updatemenus=buttons,
+      sliders=[slider]
+      )
+
+  fig = go.Figure(data=frames[0]['data'], layout=layout, frames=frames[1:])
+  return fig
+
+# %% ../02_animate.ipynb 19
+class Memoize:
+  """A class that provides a decorator for visualizing recursion trees and caching results."""
+
+  def __init__(self,
+               verbose: bool = False, # if true, print all nodes
+               animate: bool = True, # if true, create an animation of the recursion tree
+               save: bool = False, # if true, save the animation to a html file
+               path: str ='', # path to save the animation to
+               ): 
+    
+    self.verbose = verbose
+    self.animate = animate
+    self.save = save
+    self.path = path
+    self._reset()
+
+  def _reset(self):
+    """
+    self.nodes = preorder traversal of nodes
+    self.history = element i was discovered or finished at time i
+    self.pos = position of vertices in animate
+    """
+    self.nodes, self.node_to_edge_labels, self.history = {}, {}, []
+    self.id_, self.time, self.depth = 0, 0, 0
+    self.cache = {}
+    self.func_name = ''
+
+  def _animate(self, history, nodes, node_to_edge_labels, func_name):
+    
+    DG, edge_to_label = get_graph(history, nodes, node_to_edge_labels)
+    fig = animate(history, nodes, func_name, DG, edge_to_label)
+    # HTML(fig.to_html())
+    fig.show()
+    return fig
+
+
+
+    # # create recursion tree animation
+    # fig = animate(history, nodes, func_name)
+    # fig.show()
+
+    # # save figure
+    # if self.save:
+    #   if self.path == '':
+    #     input = ','.join(list(map(str, nodes[0]['input'])))
+    #     self.path = './{}_{}.html'.format(func_name, input)
+    #   fig.write_html(self.path)
+
+  def __call__(self, 
+               func: callable # function to be visualized or cached via decorator
+               ):
+    """A custom `__call__` function records the id, function input, function output, depth, discovery time, 
+    and finish time in a node each time the function is called. After all function calls are made, `__call__`
+    will animate the recursion tree. This is the main workhorse of the `RecursionVisualizer` class.
+    
+    At a high-level, the `__call__` function looks something like:
+    
+    ```
+    def __call__(self, func):
+      def memoized_func(*args, **kwargs):
+        # record discovery time, function input, and depth
+        node.discovery = time
+        node.input = args
+        node.depth = depth
         
-        # update visit status and node text color and circle color
-        visit[node_id] += 1
-        node_text_color[node_id] = visit_to_text_color[visit[node_id]]
-
-        # plot nodes
-        node_trace = go.Scatter(
-            x=node_x, y=node_y,
-            mode='markers+text',
-            hovertext=hovertext,
-            hoverinfo='text',
-            text=node_annotations,
-            textfont={'color': node_text_color},
-            marker={'line': dict(color='rgb(50,50,50)', width=1),
-                    'color': visit,
-                    'colorscale': [(0.00, '#F7FBFF'), (0.33, '#F7FBFF'),
-                                   (0.33, '#6AAED6'), (0.66, '#6AAED6'),
-                                   (0.66, '#0A306B'), (1.00, '#0A306B')
-                                   ], # colors taken from px.colors.sequential.Blues
-                    'size': 10 + 7*max_node_length},
-            showlegend=False,
-            ids=list(nodes.keys())
-            )
-
-        # plot edges
-        edge_trace = go.Scatter(
-            x=edge_x, y=edge_y,
-            line=dict(width=1, color='#888'),
-            hoverinfo='none',
-            mode='lines',
-            showlegend=False,
-            textposition="bottom right"
-            )
+        # if node not in cache, compute and cache result
+        if node not in self.cache:
+          self.cache[args] = func(*args, **kwargs)
+          
+        # record finish time and function output
+        node.output = self.cache[args]
+        node.finish = time
         
-        # updates frames and slider
-        frame = go.Frame(data=[node_trace, edge_trace], name=str(time))
-        frames.append(frame)
-        update_slider(slider, time)
+        if depth == 0:
+          animate()
+        
+      return memoized_func
+    ```
+    """
 
-        # create layout
-        layout = go.Layout(
-            title=title,
-            xaxis=axis_settings,
-            yaxis=axis_settings,
-            annotations=link_annotation+edge_annotations,
-            margin=dict(b=0,l=5,r=5,t=5),
-            updatemenus=buttons,
-            sliders=[slider]
-            )
+    def memoized_func(*args, **kwargs):
+      if self.depth == 0:
+        self._reset()
 
-        fig = go.Figure(data=frames[0]['data'], layout=layout, frames=frames[1:])
-        return fig
+      # record node's depth, discovery time, and input arguments
+      id_ = len(self.nodes)
+      node = Node(id_=id_, input=args, depth=self.depth, discovered=self.time)
+      self.history.append(node.id_)
+      self.nodes[node.id_] = node
+      self.time += 1
+
+      # update depth and call the function `func`
+      self.depth += 1
+      # if args not in self.cache:
+      self.cache[args] = func(*args, **kwargs)
+      self.depth -= 1
+
+      # record node's output, finish time, history, and edge_label
+      self.nodes[id_].output = self.cache[args]
+      self.nodes[id_].finish = self.time
+      
+      self.node_to_edge_labels[id_] = kwargs['edge_label'] if kwargs and 'edge_label' in kwargs else ''
+      self.history.append(node.id_)
+      self.time += 1
+
+      if self.verbose:
+        print(node)
+
+      # animate after done traversing through the entire tree
+      if self.animate and self.depth == 0:
+        fig = self._animate(self.history, self.nodes, self.node_to_edge_labels, func.__name__)
+        return fig, self.cache[args]
+
+      return self.cache[args]
+    return memoized_func
+
+# %% ../02_animate.ipynb 21
+import plotly.io as pio
+from IPython.display import display, HTML
+from IPython import get_ipython
+
+# %% ../02_animate.ipynb 22
+def on_colab():   # cf https://stackoverflow.com/questions/53581278/test-if-notebook-is-running-on-google-colab
+    """Returns true if code is being executed on Colab, false otherwise"""
+    try:
+        return 'google.colab' in str(get_ipython())
+    except NameError:    # no get_ipython, so definitely not on Colab
+        return False 
+
+if not on_colab():  # Nick Burrus' code for normal-Juptyer use with plotly:
+    pio.renderers.default = 'notebook_connected'
+    js = '<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>'
+    display(HTML(js))

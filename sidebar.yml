@@ -3,6 +3,6 @@ website:
     contents:
       - index.ipynb
       - 00_node.ipynb
-      - 01_recurse.ipynb
-      - 02_graph.ipynb
-      - 03_animate.ipynb
+      - 01_graph.ipynb
+      - 02_animate.ipynb
+      - 03_recurse.ipynb
