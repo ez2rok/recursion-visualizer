@@ -9,8 +9,10 @@ jobs:
         # https://stackoverflow.com/a/44009261/14773537
       - name: install pygraphviz
         run: sudo apt-get install python-dev graphviz libgraphviz-dev pkg-config
+
+        # From: https://stackoverflow.com/a/69943656/14773537
       - name: install nbformat
-        run: pip install --upgrade nbformat notebook
+        run: pip install "notebook>=5.3" "ipywidgets>=7.5"
         #run: sudo apt-get update; sudo apt-get install graphviz-dev; pip install pygraphviz; pip install pydot-ng
       - name: test
         uses: fastai/workflows/nbdev-ci@master
