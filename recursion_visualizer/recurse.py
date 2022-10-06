@@ -41,6 +41,7 @@ class RecursionVisualizer:
     
     DG, edge_to_label = get_graph(history, nodes, node_to_edge_labels)
     fig = animate(history, nodes, func_name, DG, edge_to_label)
+    fig.write_html("media/{}_{}.html".format(func_name, nodes[0].input))
     fig.show()
 
 
