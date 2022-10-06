@@ -1,0 +1,32 @@
+\documentclass[12pt]{article}
+
+\begin{document}
+
+\begin{flushleft}
+\textbf{Reader Report} \\
+Reading: Probabilistic machine learning and artifical intelligence (Ghahramani, 2015) \\
+Ethan Turok (ezt2102) \\
+\today
+\end{flushleft}
+
+\vspace{0.1in}
+
+\normalsize
+
+Probabilistic models is the art of finding which probability distributions generated the observed data. Yet uncertainy is fundamental in all of this. Uncertainty exists as noise when measuring the observed data. Uncertainty exists in the values of estimated paramaters. And uncertainty exists on the hyperparameter level or when we doubt the general structure of the model. We are also uncertain what future data will look like.
+
+The main computational challenge is that we often want to marginalize out the variables we are not interested in. This often creates sums and integrals that cannot be solved in polynomial time. Thus, approximation algorithms are often used.
+
+To estimate a probability distribution in a non-parametric way, we can use:
+Gaussian processes (eg: GaussianFace recognizes faces better than humans),
+Dirichlet processes, and Indian buffet process. Probabilistic programming uses
+computer sampling to represent probabilistic models. Normally programs take
+probability distribution parameters and output data sampled from that
+distribution. Yet here we input the data and using Monte Carlo sampling, we try
+find which parameters generated it.
+
+
+
+
+
+\end{document}
