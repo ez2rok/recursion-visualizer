@@ -6,7 +6,12 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - name: install
+
+        # A stackoverflow post recommends to install these packages to get
+        # pygraphviz to work:
+        # https://stackoverflow.com/a/44009261/14773537
         run: sudo apt-get install python-dev graphviz libgraphviz-dev pkg-config
+        run: pip install --upgrade nbformat
         #run: sudo apt-get update; sudo apt-get install graphviz-dev; pip install pygraphviz; pip install pydot-ng
       - name: test
         uses: fastai/workflows/nbdev-ci@master
