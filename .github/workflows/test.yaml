@@ -6,6 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - name: install
-        run: sudo apt-get update; sudo apt-get install graphviz-dev; pip install pygraphviz; pip install pydot-ng
+        run: sudo apt-get install python-dev graphviz libgraphviz-dev pkg-config
+        #run: sudo apt-get update; sudo apt-get install graphviz-dev; pip install pygraphviz; pip install pydot-ng
       - name: test
         uses: fastai/workflows/nbdev-ci@master
