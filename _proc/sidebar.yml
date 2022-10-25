@@ -1,8 +1,0 @@
-website:
-  sidebar:
-    contents:
-      - index.ipynb
-      - 00_node.ipynb
-      - 01_graph.ipynb
-      - 02_animate.ipynb
-      - 03_recurse.ipynb
