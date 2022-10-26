@@ -2,7 +2,7 @@
 
 # %% auto 0
 __all__ = ['get_node_and_edge_coordinates', 'get_node_text', 'get_edge_text', 'get_link_annotation', 'get_title', 'get_slider',
-           'update_slider', 'get_play_pause_buttons', 'get_axis_settings', 'animate', 'Memoize', 'on_colab']
+           'update_slider', 'get_play_pause_buttons', 'get_axis_settings', 'animate']
 
 # %% ../02_animate.ipynb 2
 from .node import Node 
@@ -46,6 +46,7 @@ def get_node_and_edge_coordinates(
 def get_node_text(
    nodes: Dict[int, Node], # map of node ids to nodes
    func_name: str, # name of the recursive function
+   display_args
    ) -> List[List[str]]: # text(s) to be displayed on each node
    """Return the text(s) to be displayed on each node. Specifically, return
   
@@ -62,7 +63,14 @@ def get_node_text(
    max_node_length = 0
 
    for node in nodes.values():
-      function_input = ','.join(list(map(str, node.input)))
+      
+      # get arguments to the recursive function
+      # if `display_args` is a list, only display the ith argument if i is in `display_args`
+      input_ = list(map(str, node.input))
+      if isinstance(display_args, list):
+         input_ = [input_[arg_idx] for arg_idx in display_args]
+      function_input = ','.join(input_)
+      
       text = '{}({})={}'.format(func_name, function_input, node.output)
       text += '<br>discover: {}<br>finish: {}'.format(node.discovered, node.finish)
 
@@ -223,14 +231,15 @@ def get_axis_settings() -> dict: # axis settings
 def animate(history,nodes,
             func_name, 
             DG, 
-            edge_to_label
+            edge_to_label,
+            display_args
             ):
   
   # get node and edge coordinates
   node_x, node_y, edge_x, edge_y = get_node_and_edge_coordinates(DG)
   
   # get text to be displayed on the nodes, edges, and figure
-  max_node_length, node_annotations, hovertext = get_node_text(nodes, func_name)
+  max_node_length, node_annotations, hovertext = get_node_text(nodes, func_name, display_args)
   edge_annotations = get_edge_text(node_x, node_y, edge_to_label)
   link_annotation = get_link_annotation()
   title = get_title(nodes, func_name)
@@ -309,138 +318,3 @@ def animate(history,nodes,
 
   fig = go.Figure(data=frames[0]['data'], layout=layout, frames=frames[1:])
   return fig
-
-# %% ../02_animate.ipynb 19
-class Memoize:
-  """A class that provides a decorator for visualizing recursion trees and caching results."""
-
-  def __init__(self,
-               verbose: bool = False, # if true, print all nodes
-               animate: bool = True, # if true, create an animation of the recursion tree
-               save: bool = False, # if true, save the animation to a html file
-               path: str ='', # path to save the animation to
-               ): 
-    
-    self.verbose = verbose
-    self.animate = animate
-    self.save = save
-    self.path = path
-    self._reset()
-
-  def _reset(self):
-    """
-    self.nodes = preorder traversal of nodes
-    self.history = element i was discovered or finished at time i
-    self.pos = position of vertices in animate
-    """
-    self.nodes, self.node_to_edge_labels, self.history = {}, {}, []
-    self.id_, self.time, self.depth = 0, 0, 0
-    self.cache = {}
-    self.func_name = ''
-
-  def _animate(self, history, nodes, node_to_edge_labels, func_name):
-    
-    DG, edge_to_label = get_graph(history, nodes, node_to_edge_labels)
-    fig = animate(history, nodes, func_name, DG, edge_to_label)
-    # HTML(fig.to_html())
-    fig.show()
-    return fig
-
-
-
-    # # create recursion tree animation
-    # fig = animate(history, nodes, func_name)
-    # fig.show()
-
-    # # save figure
-    # if self.save:
-    #   if self.path == '':
-    #     input = ','.join(list(map(str, nodes[0]['input'])))
-    #     self.path = './{}_{}.html'.format(func_name, input)
-    #   fig.write_html(self.path)
-
-  def __call__(self, 
-               func: callable # function to be visualized or cached via decorator
-               ):
-    """A custom `__call__` function records the id, function input, function output, depth, discovery time, 
-    and finish time in a node each time the function is called. After all function calls are made, `__call__`
-    will animate the recursion tree. This is the main workhorse of the `RecursionVisualizer` class.
-    
-    At a high-level, the `__call__` function looks something like:
-    
-    ```
-    def __call__(self, func):
-      def memoized_func(*args, **kwargs):
-        # record discovery time, function input, and depth
-        node.discovery = time
-        node.input = args
-        node.depth = depth
-        
-        # if node not in cache, compute and cache result
-        if node not in self.cache:
-          self.cache[args] = func(*args, **kwargs)
-          
-        # record finish time and function output
-        node.output = self.cache[args]
-        node.finish = time
-        
-        if depth == 0:
-          animate()
-        
-      return memoized_func
-    ```
-    """
-
-    def memoized_func(*args, **kwargs):
-      if self.depth == 0:
-        self._reset()
-
-      # record node's depth, discovery time, and input arguments
-      id_ = len(self.nodes)
-      node = Node(id_=id_, input=args, depth=self.depth, discovered=self.time)
-      self.history.append(node.id_)
-      self.nodes[node.id_] = node
-      self.time += 1
-
-      # update depth and call the function `func`
-      self.depth += 1
-      # if args not in self.cache:
-      self.cache[args] = func(*args, **kwargs)
-      self.depth -= 1
-
-      # record node's output, finish time, history, and edge_label
-      self.nodes[id_].output = self.cache[args]
-      self.nodes[id_].finish = self.time
-      
-      self.node_to_edge_labels[id_] = kwargs['edge_label'] if kwargs and 'edge_label' in kwargs else ''
-      self.history.append(node.id_)
-      self.time += 1
-
-      if self.verbose:
-        print(node)
-
-      # animate after done traversing through the entire tree
-      if self.animate and self.depth == 0:
-        fig = self._animate(self.history, self.nodes, self.node_to_edge_labels, func.__name__)
-        return fig, self.cache[args]
-
-      return self.cache[args]
-    return memoized_func
-
-# %% ../02_animate.ipynb 21
-import plotly.io as pio
-from IPython.display import display, HTML
-from IPython import get_ipython
-
-# %% ../02_animate.ipynb 22
-def on_colab():   # cf https://stackoverflow.com/questions/53581278/test-if-notebook-is-running-on-google-colab
-    """Returns true if code is being executed on Colab, false otherwise"""
-    try:
-        return 'google.colab' in str(get_ipython())
-    except NameError:    # no get_ipython, so definitely not on Colab
-        return False 
-
-if not on_colab():  # Nick Burrus' code for normal-Juptyer use with plotly:
-    pio.renderers.default = 'notebook_connected'
-    js = '<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>'
-    display(HTML(js))
