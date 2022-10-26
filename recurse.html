@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.251">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="A class that provides a decorator for visualizing recursion trees and caching results">
+
+<title>recursion-visualizer - recurse</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+        <script type="text/javascript">
+        window.PlotlyConfig = {MathJaxConfig: 'local'};
+        if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}
+        if (typeof require !== 'undefined') {
+        require.undef("plotly");
+        requirejs.config({
+            paths: {
+                'plotly': ['https://cdn.plot.ly/plotly-2.14.0.min']
+            }
+        });
+        require(['plotly'], function(Plotly) {
+            window._Plotly = Plotly;
+        });
+        }
+        </script>
+        
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="recursion-visualizer - recurse">
+<meta property="og:description" content="A class that provides a decorator for visualizing recursion trees and caching results">
+<meta property="og:site-name" content="recursion-visualizer">
+<meta name="twitter:title" content="recursion-visualizer - recurse">
+<meta name="twitter:description" content="A class that provides a decorator for visualizing recursion trees and caching results">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">recursion-visualizer</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">recurse</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">recursion-visualizer</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./node.html" class="sidebar-item-text sidebar-link">node</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./graph.html" class="sidebar-item-text sidebar-link">graph</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./animate.html" class="sidebar-item-text sidebar-link">animate</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./recurse.html" class="sidebar-item-text sidebar-link active">recurse</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#make_args_hashable" id="toc-make_args_hashable" class="nav-link active" data-scroll-target="#make_args_hashable">make_args_hashable</a></li>
+  <li><a href="#recursionvisualizer" id="toc-recursionvisualizer" class="nav-link" data-scroll-target="#recursionvisualizer">RecursionVisualizer</a></li>
+  <li><a href="#on_colab" id="toc-on_colab" class="nav-link" data-scroll-target="#on_colab">on_colab</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/ez2rok/recursion-visualizer/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">recurse</h1>
+</div>
+
+<div>
+  <div class="description">
+    A class that provides a decorator for visualizing recursion trees and caching results
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<hr>
+<p><a href="https://github.com/ez2rok/recursion-visualizer/blob/master/recursion_visualizer/recurse.py#L15" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="make_args_hashable" class="level3">
+<h3 class="anchored" data-anchor-id="make_args_hashable">make_args_hashable</h3>
+<blockquote class="blockquote">
+<pre><code> make_args_hashable (args)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/ez2rok/recursion-visualizer/blob/master/recursion_visualizer/recurse.py#L29" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="recursionvisualizer" class="level3">
+<h3 class="anchored" data-anchor-id="recursionvisualizer">RecursionVisualizer</h3>
+<blockquote class="blockquote">
+<pre><code> RecursionVisualizer (verbose:bool=False, animate:bool=True,
+                      save:bool=False, path:str='',
+                      display_args:Union[bool,List]=True)</code></pre>
+</blockquote>
+<p>A class that provides a decorator for visualizing recursion trees and caching results.</p>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>verbose</td>
+<td>bool</td>
+<td>False</td>
+<td>if true, print all nodes</td>
+</tr>
+<tr class="even">
+<td>animate</td>
+<td>bool</td>
+<td>True</td>
+<td>if true, create an animation of the recursion tree</td>
+</tr>
+<tr class="odd">
+<td>save</td>
+<td>bool</td>
+<td>False</td>
+<td>if true, save the animation to a html file</td>
+</tr>
+<tr class="even">
+<td>path</td>
+<td>str</td>
+<td></td>
+<td>path to save the animation to</td>
+</tr>
+<tr class="odd">
+<td>display_args</td>
+<td>Union</td>
+<td>True</td>
+<td>If True, display all arguments of the recursive function in each node; if list, only display arguments whose indices are in this list</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/ez2rok/recursion-visualizer/blob/master/recursion_visualizer/recurse.py#L154" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="on_colab" class="level3">
+<h3 class="anchored" data-anchor-id="on_colab">on_colab</h3>
+<blockquote class="blockquote">
+<pre><code> on_colab ()</code></pre>
+</blockquote>
+<p>Returns true if code is being executed on Colab, false otherwise</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>on_colab()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>False</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="at">@RecursionVisualizer</span>()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fib(n):</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> n <span class="op">&lt;=</span> <span class="dv">2</span>: </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> fib(n<span class="op">-</span><span class="dv">1</span>) <span class="op">+</span> fib(n<span class="op">-</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, result <span class="op">=</span> fib(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>                            <div id="3bcfa41d-f79e-4581-8ce1-b0e78a0f4406" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("3bcfa41d-f79e-4581-8ce1-b0e78a0f4406")) {                    Plotly.newPlot(                        "3bcfa41d-f79e-4581-8ce1-b0e78a0f4406",                        [{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[0,0,0,0,0,0,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],                        {"annotations":[{"showarrow":false,"text":"Made with <a href='https://github.com/ez2rok/recursion-visualizer'>Recursion Visualizer</a>","x":0.005,"xref":"paper","y":-0.002,"yref":"paper"},{"font":{"color":"rgb(0,0,0)","size":10},"showarrow":false,"text":"","x":158.0,"xref":"x","y":203.0,"yref":"y"},{"font":{"color":"rgb(0,0,0)","size":10},"showarrow":false,"text":"","x":104.0,"xref":"x","y":131.0,"yref":"y"},{"font":{"color":"rgb(0,0,0)","size":10},"showarrow":false,"text":"","x":50.0,"xref":"x","y":59.0,"yref":"y"},{"font":{"color":"rgb(0,0,0)","size":10},"showarrow":false,"text":"","x":86.0,"xref":"x","y":59.0,"yref":"y"},{"font":{"color":"rgb(0,0,0)","size":10},"showarrow":false,"text":"","x":140.0,"xref":"x","y":131.0,"yref":"y"},{"font":{"color":"rgb(0,0,0)","size":10},"showarrow":false,"text":"","x":194.0,"xref":"x","y":203.0,"yref":"y"},{"font":{"color":"rgb(0,0,0)","size":10},"showarrow":false,"text":"","x":212.0,"xref":"x","y":131.0,"yref":"y"},{"font":{"color":"rgb(0,0,0)","size":10},"showarrow":false,"text":"","x":248.0,"xref":"x","y":131.0,"yref":"y"}],"margin":{"b":0,"l":5,"r":5,"t":5},"sliders":[{"active":0,"currentvalue":{"font":{"size":20},"prefix":"Time:","visible":true,"xanchor":"right"},"len":0.9,"pad":{"b":5,"t":5},"steps":[{"args":[[0],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"0","method":"animate"},{"args":[[1],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"1","method":"animate"},{"args":[[2],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"2","method":"animate"},{"args":[[3],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"3","method":"animate"},{"args":[[4],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"4","method":"animate"},{"args":[[5],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"5","method":"animate"},{"args":[[6],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"6","method":"animate"},{"args":[[7],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"7","method":"animate"},{"args":[[8],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"8","method":"animate"},{"args":[[9],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"9","method":"animate"},{"args":[[10],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"10","method":"animate"},{"args":[[11],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"11","method":"animate"},{"args":[[12],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"12","method":"animate"},{"args":[[13],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"13","method":"animate"},{"args":[[14],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"14","method":"animate"},{"args":[[15],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"15","method":"animate"},{"args":[[16],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"16","method":"animate"},{"args":[[17],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"17","method":"animate"},{"args":[[18],{"frame":{"duration":300,"redraw":false},"mode":"immediate","transition":{"duration":300}}],"label":"18","method":"animate"}],"transition":{"duration":300,"easing":"cubic-in-out"},"x":0.1,"xanchor":"left","y":0,"yanchor":"top"}],"title":{"text":"Recursive Tree: fib(5)","x":0.02,"xanchor":"left","y":0.95,"yanchor":"top"},"updatemenus":[{"buttons":[{"args":[null,{"frame":{"duration":500,"redraw":false},"fromcurrent":true,"transition":{"duration":300,"easing":"quadratic-in-out"}}],"label":"Play","method":"animate"},{"args":[[null],{"frame":{"duration":0,"redraw":false},"mode":"immediate","transition":{"duration":0}}],"label":"Pause","method":"animate"}],"direction":"up","pad":{"r":20,"t":15},"showactive":true,"type":"buttons","x":0.1,"xanchor":"right","y":0,"yanchor":"top"}],"xaxis":{"showgrid":false,"showline":false,"showticklabels":false,"zeroline":false},"yaxis":{"showgrid":false,"showline":false,"showticklabels":false,"zeroline":false},"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
+                            Plotly.addFrames('3bcfa41d-f79e-4581-8ce1-b0e78a0f4406', [{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,0,0,0,0,0,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"1"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,1,0,0,0,0,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"2"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,1,1,0,0,0,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"3"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,1,1,1,0,0,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"4"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,1,1,2,0,0,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"5"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,1,1,2,1,0,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"6"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,1,1,2,2,0,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"7"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,1,2,2,2,0,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"8"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,1,2,2,2,1,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"9"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,1,2,2,2,2,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"10"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,2,2,2,2,2,0,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"11"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,2,2,2,2,2,1,0,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"12"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,2,2,2,2,2,1,1,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"13"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,2,2,2,2,2,1,2,0],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(0,0,0)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"14"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,2,2,2,2,2,1,2,1],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"15"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,2,2,2,2,2,1,2,2],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"16"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[1,2,2,2,2,2,2,2,2],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"17"},{"data":[{"hoverinfo":"text","hovertext":["fib(5)=5<br>discover: 0<br>finish: 17","fib(4)=3<br>discover: 1<br>finish: 10","fib(3)=2<br>discover: 2<br>finish: 7","fib(2)=1<br>discover: 3<br>finish: 4","fib(1)=1<br>discover: 5<br>finish: 6","fib(2)=1<br>discover: 8<br>finish: 9","fib(3)=2<br>discover: 11<br>finish: 16","fib(2)=1<br>discover: 12<br>finish: 13","fib(1)=1<br>discover: 14<br>finish: 15"],"ids":[0,1,2,3,4,5,6,7,8],"marker":{"cmid":1,"color":[2,2,2,2,2,2,2,2,2],"colorscale":[[0.0,"#F7FBFF"],[0.33,"#F7FBFF"],[0.33,"#6AAED6"],[0.66,"#6AAED6"],[0.66,"#0A306B"],[1.0,"#0A306B"]],"line":{"color":"rgb(50,50,50)","width":1},"size":17},"mode":"markers+text","showlegend":false,"text":["5","4","3","2","1","2","3","2","1"],"textfont":{"color":["rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)","rgb(255, 255, 255)"]},"x":[171.0,135.0,63.0,27.0,99.0,135.0,207.0,207.0,279.0],"y":[234.0,162.0,90.0,18.0,18.0,90.0,162.0,90.0,90.0],"type":"scatter"},{"hoverinfo":"none","line":{"color":"#888","width":1},"mode":"lines","showlegend":false,"textposition":"bottom right","x":[171.0,135.0,null,171.0,207.0,null,135.0,63.0,null,135.0,135.0,null,63.0,27.0,null,63.0,99.0,null,207.0,207.0,null,207.0,279.0,null],"y":[234.0,162.0,null,234.0,162.0,null,162.0,90.0,null,162.0,90.0,null,90.0,18.0,null,90.0,18.0,null,162.0,90.0,null,162.0,90.0,null],"type":"scatter"}],"name":"18"}]);
+                        }).then(function(){
+                            
+var gd = document.getElementById('3bcfa41d-f79e-4581-8ce1-b0e78a0f4406');
+var x = new MutationObserver(function (mutations, observer) {{
+        var display = window.getComputedStyle(gd).display;
+        if (!display || display === 'none') {{
+            console.log([gd, 'removed!']);
+            Plotly.purge(gd);
+            observer.disconnect();
+        }}
+}});
+
+// Listen for the removal of the full notebook cells
+var notebookContainer = gd.closest('#notebook-container');
+if (notebookContainer) {{
+    x.observe(notebookContainer, {childList: true});
+}}
+
+// Listen for the clearing of the current output cell
+var outputEl = gd.closest('.output');
+if (outputEl) {{
+    x.observe(outputEl, {childList: true});
+}}
+
+                        })                };                });            </script>        </div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>5</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

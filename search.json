@@ -1,0 +1,114 @@
+[
+  {
+    "objectID": "graph.html",
+    "href": "graph.html",
+    "title": "graph",
+    "section": "",
+    "text": "nodes records all the nodes encountered\nhistory records the time at which each node is first visited and finished being visited\n\nnodes and history capture the graph of recursive function calls but in a convoluted, inaccessible way. (For example, given a node, it is not immediately clear how to use nodes and history to figure out which nodes are its parents.) The functions get_graph take in nodes and history and return a list of nodes and edges that define the graph of recursive function calls. Specifically, the nodes and edges are represented as a networkx graph object which has many additional helpful features.\n(Technically, RecursionVisualizer records one last piece of information: node_to_edge_labels which maps a node to an edge label. Due to the limited capabilities of the RecursionVisualizer decorator, it is only possible to map an edge label to one of the nodes in the edge. We cannot easily map an edge label to both nodes that make up the edge. The function get_graph are also responsible for correctly mapping each edge label to the proper edge.)\n\nsource\n\nget_preorder_traversal\n\n get_preorder_traversal (history:List[int])\n\nExtract the preorder traversal from history by recording the order of when each node is first discovered.\n\n\n\n\n\n\n\n\n\nType\nDetails\n\n\n\n\nhistory\nList\nlist of node ids recording when each node is first visited and finished being visited\n\n\nReturns\nList\npreorder traversal of the graph\n\n\n\n\nsource\n\n\nget_graph_edges\n\n get_graph_edges (nodes:Dict[int,recursion_visualizer.node.Node],\n                  preorder:List[int], node_to_edge_labels:Dict[int,str])\n\nConvert the preorder traversal preorder into a list of edges that define the graph of recursive function calls.\nExtract the edges from the preorder traversal by analyzing the depth of each node. Collect all the edges and then map each edges to a string label.\nReferences:\n\nInspired by lee215’s solution to Leetcode 1028. Recover a Tree From Preorder Traversal.\n\n\n\n\n\n\n\n\n\n\nType\nDetails\n\n\n\n\nnodes\nDict\nmap from node id to node\n\n\npreorder\nList\nlist of node ids where each node id is recorded when it is first discovered and finished being explored,\n\n\nnode_to_edge_labels\nDict\nmap from node id to edge label\n\n\nReturns\nDict\nmap from an edge to label (an edge is a tuple of two node ids)\n\n\n\n\nsource\n\n\nget_graph\n\n get_graph (history:List[int],\n            nodes:Dict[int,recursion_visualizer.node.Node],\n            node_to_edge_labels:Dict[tuple,str])\n\nConvert the history of recursive function calls, into a networkx graph of recursive function calls with optionally labeled edges.\nThe graph is constructed by 1) extracting the preorder traversal of the graph from history and then 2) extracting the edges of the graph based on the depth of each node in the preorder traversal.\n\n\n\n\n\n\n\n\n\nType\nDetails\n\n\n\n\nhistory\nList\nlist of node ids recording when each node is first visited and finished being visited\n\n\nnodes\nDict\nmap from node id to node\n\n\nnode_to_edge_labels\nDict\nmap from a node to an edge label"
+  },
+  {
+    "objectID": "node.html",
+    "href": "node.html",
+    "title": "node",
+    "section": "",
+    "text": "Each node represents a single recursive function call. Together, a graph of these nodes show which functions recursively call which other functions. This can be very helpful in developing an intutive understanding of each recursive call.\nOther functions will thus build upon the Node class to create the animated graph of recursive function calls.\nsource"
+  },
+  {
+    "objectID": "node.html#time",
+    "href": "node.html#time",
+    "title": "node",
+    "section": "Time",
+    "text": "Time\nThe discovered time and finish time do not refer to the runtime or literal time of day. Instead this time is a way to record helpful information about the graph traversal. This time begins at zero and is incremented by one when a node is first discovered or when it (and its descandents) are completly finished being explored. In the context of storing recursive calls, discovered is when the recursive call is first made and its execution begins. finished is when the recursive call (and its subsequent functions calls) have all finished executing."
+  },
+  {
+    "objectID": "animate.html",
+    "href": "animate.html",
+    "title": "animate",
+    "section": "",
+    "text": "source\n\n\n\n get_node_and_edge_coordinates (DG)\n\nGiven a map of edges to labels, create a networkx graph and use its layout function to return a list of x and y coordinates for placing nodes and edges on a 2D plot.\n\n\n\n\n\n\n\n\n\nType\nDetails\n\n\n\n\nDG\n\nnetworkx graph of recursive function calls\n\n\nReturns\nList\nlist of x and y coordinates for placing nodes and edges on 2D plot"
+  },
+  {
+    "objectID": "animate.html#text",
+    "href": "animate.html#text",
+    "title": "animate",
+    "section": "Text",
+    "text": "Text\n\nsource\n\nget_node_text\n\n get_node_text (nodes:Dict[int,recursion_visualizer.node.Node],\n                func_name:str, display_args)\n\nReturn the text(s) to be displayed on each node. Specifically, return\n\nmax_node_length: the length of the longest node annotation text; used to determine the size of the node (in pixels)\nnode_annotations: the text that appears in each node; this is set to be the input to the recursive function\nhovertext: the text that appears when the user hovers over a node in the graph; this is set to the input+output to the recursive function and the discovery+finish times of the recursive function.\n\n\n\n\n\nType\nDetails\n\n\n\n\nnodes\nDict\nmap of node ids to nodes\n\n\nfunc_name\nstr\nname of the recursive function\n\n\ndisplay_args\n\n\n\n\nReturns\nList\ntext(s) to be displayed on each node\n\n\n\n\nsource\n\n\nget_edge_text\n\n get_edge_text (node_x:List[int], node_y:List[int],\n                edge_to_label:Dict[tuple,str])\n\nReturn the text(s) to be displayed on each edge. This is optional and by default will display an empty string along each edge. Specifically, return\n\nedge_text: the text that appears along each edge; this is set to be edge_label, a keyword found in the decorated recursive function.\n\n\n\n\n\n\n\n\n\n\nType\nDetails\n\n\n\n\nnode_x\nList\nx coordinates of nodes\n\n\nnode_y\nList\ny coordinates of nodes\n\n\nedge_to_label\nDict\nmap of edges to labels (edge is a tuple of two node ids)\n\n\nReturns\nList\ntext(s) to be displayed on each edge\n\n\n\n\nsource\n\n\nget_link_annotation\n\n get_link_annotation ()\n\nReturn the (formatted) text that links to this library’s GitHub repo.\n\nsource\n\n\nget_title\n\n get_title (nodes:Dict[int,recursion_visualizer.node.Node], func_name:str)\n\nReturn the (formatted) title of the graph\n\n\n\n\nType\nDetails\n\n\n\n\nnodes\nDict\nmap of node ids to nodes\n\n\nfunc_name\nstr\nname of the recursive function\n\n\nReturns\nstr\ntitle of the graph"
+  },
+  {
+    "objectID": "animate.html#graphics",
+    "href": "animate.html#graphics",
+    "title": "animate",
+    "section": "Graphics",
+    "text": "Graphics\n\nsource\n\nget_slider\n\n get_slider ()\n\nReturn the slider that allows the user to control the animation\n\nsource\n\n\nupdate_slider\n\n update_slider (slider:dict, time:int)\n\nUpdate the slider with the current time\n\n\n\n\nType\nDetails\n\n\n\n\nslider\ndict\nslider that allows the user to control the animation\n\n\ntime\nint\ncurrent time\n\n\nReturns\ndict\nupdated slider\n\n\n\n\nsource\n\n\nget_play_pause_buttons\n\n get_play_pause_buttons ()\n\nReturn the play/pause buttons\nReferences:\n\nHeavily inspired by Plotly animation tutorial\n\n\nsource\n\n\nget_axis_settings\n\n get_axis_settings ()\n\nReturn the axis settings"
+  },
+  {
+    "objectID": "animate.html#generate-animation",
+    "href": "animate.html#generate-animation",
+    "title": "animate",
+    "section": "Generate Animation",
+    "text": "Generate Animation\n\nsource\n\nanimate\n\n animate (history, nodes, func_name, DG, edge_to_label, display_args)"
+  },
+  {
+    "objectID": "recurse.html",
+    "href": "recurse.html",
+    "title": "recurse",
+    "section": "",
+    "text": "source\n\nmake_args_hashable\n\n make_args_hashable (args)\n\n\nsource\n\n\nRecursionVisualizer\n\n RecursionVisualizer (verbose:bool=False, animate:bool=True,\n                      save:bool=False, path:str='',\n                      display_args:Union[bool,List]=True)\n\nA class that provides a decorator for visualizing recursion trees and caching results.\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nverbose\nbool\nFalse\nif true, print all nodes\n\n\nanimate\nbool\nTrue\nif true, create an animation of the recursion tree\n\n\nsave\nbool\nFalse\nif true, save the animation to a html file\n\n\npath\nstr\n\npath to save the animation to\n\n\ndisplay_args\nUnion\nTrue\nIf True, display all arguments of the recursive function in each node; if list, only display arguments whose indices are in this list\n\n\n\n\nsource\n\n\non_colab\n\n on_colab ()\n\nReturns true if code is being executed on Colab, false otherwise\n\non_colab()\n\nFalse\n\n\n\n@RecursionVisualizer()\ndef fib(n):\n  if n <= 2: \n    return 1\n  return fib(n-1) + fib(n-2)\n\n\nfig, result = fib(5)\n\n\n                                                \n\n\n\nresult\n\n5"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "recursion-visualizer",
+    "section": "",
+    "text": "Stop drawing recursion trees by hand. RecursionVisualizer creates beautiful, interactive visualizations with a single line of code.\nVisualize computing the n-th fibonacci number like this:"
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "recursion-visualizer",
+    "section": "Install",
+    "text": "Install\npip install recursion_visualizer\nor\nconda install -c conda-forge recursion_visualizer"
+  },
+  {
+    "objectID": "index.html#how-to-use",
+    "href": "index.html#how-to-use",
+    "title": "recursion-visualizer",
+    "section": "How to Use",
+    "text": "How to Use\nSimply add the RecursionVisualizer decorator to your recursive function and get a beautiful, interactive animation!\nToggle the DP button to visualize which function calls are evaluated with and without dynamic programming (DP)."
+  },
+  {
+    "objectID": "index.html#examples",
+    "href": "index.html#examples",
+    "title": "recursion-visualizer",
+    "section": "Examples",
+    "text": "Examples\n\nFibonacci\nVisualize computing the n-th fibonacci number like this:\n\n@RecursionVisualizer()\ndef fibonacci(n):\n  if n <= 2: \n    return 1\n  return fibonacci(n-1) + fibonacci(n-2)\n\n\nfibonacci(5)\n\n\n                                                \n\n\n(None, 5)\n\n\nThere are several things to note:\n\nEach node represents a single call to fibonacci\nIf fibonacci(i) calls fibonacci(i-1) and fibonacci(i-2), then the node i will have children i-1 and i-2\nThe tree is rooted at 5 because we initially called the function fibonacci(5)\n1 and 2 are the the leaves of this tree because the base cases of fibonacci is when i=1 or i=2\nThe animation illustrates the order in which the computer evaluates all of the fibonacci calls\nToggle the DP button to see how using dynamic programming (DP) changes which function calls are evaluated\n\n\n\n0-1 Knapsack\nVisualzie the 0-1 knapsack problem like this:\n\n@RecursionVisualizer(display_args=[0])\ndef knapsack(capacity, weights, values, i, edge_label=''):\n  \n  # create edge labels\n  label_1 = 'skip W={}, V={}'.format(weights[i-1], values[i-1])\n  label_2 = 'skip W={}, V={}'.format(weights[i-1], values[i-1])\n  label_3 = 'take W={}, V={}'.format(weights[i-1], values[i-1])\n  \n  # base case\n  if i == 0 or capacity == 0:\n    return 0\n  \n  # if the weight of the current item is more than the capacity\n  if weights[i-1] > capacity:\n    return knapsack(capacity, weights, values, i-1, edge_label=label_1)\n  \n  # return the maximum of two cases: including the ith-item or not including it\n  return max(knapsack(capacity, weights, values, i-1, edge_label=label_2),\n             values[i-1] + knapsack(capacity-weights[i-1], weights, values, i-1, edge_label=label_3))\n\n\nweights = [10, 20]\nvalues = [60, 100]\ncapacity = 50\n\nknapsack(capacity, weights, values, len(weights))\n\n\n                                                \n\n\n(None, 160)\n\n\nThere are several things to note:\n\nEach node represents a single call to the knapsack function\nThe display_args=[0] parameter in @RecursionVisualizer means that even though knapsack takes in four arguments, we will only display the 0th argument in each node\nEach node displays the the capacity, how much more weight you can add to your knapsack (this is the 0th argument to knapsack)\nThis tree has a branching factor of two because every level represents either taking or not taking the ith item\n\n\n\nEdit Distance\nVisualize computing the edit distance like this:\n\n@RecursionVisualizer(display_args=[0, 1])\ndef edit_distance(m, n, str1, str2, edge_label=''):\n    \n    # edge labels\n    replace_label = 's1={}, s2={}'.format(str1[:m], str2[:n])\n    insert_label = 's1={}, s2={}'.format(str1[:m+1], str2[:n])\n    remove_label = 's1={}, s2={}'.format(str1[:m], str2[:n+1])\n\n    # base case\n    if m == 0 or n == 0: \n        return max(n, m)\n\n    # if the last characters are the same: compute distance for the remaining strings\n    if str1[m-1] == str2[n-1]:\n        return edit_distance(m-1, n-1, str1, str2, edge_label=replace_label)\n\n    # if last characters are not the same: insert, remove, and replace the last character, and return the minimum\n    return 1 + min(edit_distance(m, n-1, str1, str2, edge_label=insert_label),    # insert\n                edit_distance(m-1, n, str1, str2, edge_label=remove_label),       # remove\n                edit_distance(m-1, n-1, str1, str2, edge_label=replace_label)     # replace\n                )\n\n\nstr1, str2 = \"it\", \"hi\"\nedit_distance(len(str1), len(str2), str1, str2)\n\n\n                                                \n\n\n(None, 2)\n\n\n\n\nMergesort\nVisualize the mergesort algorithm like this:\n\ndef mergesort_wrapper(nums):\n\n  def merge(lo, mid, hi):\n    \"helper function for mergesort\"\n    L, R = nums[lo:mid+1] + [float('inf')], nums[mid+1:hi+1] + [float('inf')]\n    i, j = 0, 0\n    for k in range(lo, hi+1):\n      if L[i] <= R[j]:\n        nums[k] = L[i]\n        i += 1\n      else:\n        nums[k] = R[j]\n        j += 1\n\n  @RecursionVisualizer()\n  def mergesort(lo, hi, edge_label=''):\n\n    if lo < hi:\n      mid = lo + (hi-lo) // 2\n      mergesort(lo, mid, edge_label='nums={}'.format(nums[lo:mid+1]))\n      mergesort(mid+1, hi, edge_label='nums={}'.format(nums[mid+1:hi+1]))\n      merge(lo, mid, hi)\n      return nums[lo:hi+1]\n\n  mergesort(0, len(nums)-1)  \n  return nums\n\n\nnums = [3, 1, 9, 4]\nmergesort_wrapper(nums)\n\n\n                                                \n\n\n[1, 3, 4, 9]"
+  },
+  {
+    "objectID": "index.html#features",
+    "href": "index.html#features",
+    "title": "recursion-visualizer",
+    "section": "Features",
+    "text": "Features\nFor all animations:\n\nEach node represents a single recursive function call\nThe animation illustrates the order in which the computer evaluates each of these function calls\nToggle the DP button to see how using dynamic programming (DP) changes which function calls are evaluated\n\nExtra features:\n\nHovering the cursor over a node displays additional information\nThe nodes have different colors:\n\nA node is unvisited if it is white   3 \nWe are visiting a node if it is medium blue   3 \nA node is visited if it is dark blue   3 \n\nAt any given time, the path of medium blue nodes illustrates the current functions in the call stack, ie the functions that are currently being executed\nThe leaf nodes represent the base case"
+  },
+  {
+    "objectID": "index.html#limitations",
+    "href": "index.html#limitations",
+    "title": "recursion-visualizer",
+    "section": "Limitations",
+    "text": "Limitations\nRecursionVisualizer is intended for educational purposes only. It is not intended for real world applications or commerical use.\nTo create an animation of a recursive function, RecursionVisualizer must run the brute force version of the recursive function with no dynamic programming. This means that RecursionVisualizer will often have an exponential runtime. For this reason, we recommend using RecursionVisualizer on inputs no larger than n=10. (n may be the length of a string/list or the number of vertices/edges in a graph.)"
+  },
+  {
+    "objectID": "index.html#contributions",
+    "href": "index.html#contributions",
+    "title": "recursion-visualizer",
+    "section": "Contributions",
+    "text": "Contributions\nAll contributions are welcome. Simply create a pull request to begin contributing.\nNote: RecursionVisualizer is made with nbdev, a tool to create software with notebooks. For more information on nbdev go to their homepage."
+  },
+  {
+    "objectID": "index.html#license",
+    "href": "index.html#license",
+    "title": "recursion-visualizer",
+    "section": "License",
+    "text": "License\nMIT"
+  }
+]

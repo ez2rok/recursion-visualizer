@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.251">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Recover the graph of recursive functions calls">
+
+<title>recursion-visualizer - graph</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="recursion-visualizer - graph">
+<meta property="og:description" content="Recover the graph of recursive functions calls">
+<meta property="og:site-name" content="recursion-visualizer">
+<meta name="twitter:title" content="recursion-visualizer - graph">
+<meta name="twitter:description" content="Recover the graph of recursive functions calls">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">recursion-visualizer</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">graph</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">recursion-visualizer</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./node.html" class="sidebar-item-text sidebar-link">node</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./graph.html" class="sidebar-item-text sidebar-link active">graph</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./animate.html" class="sidebar-item-text sidebar-link">animate</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./recurse.html" class="sidebar-item-text sidebar-link">recurse</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#get_preorder_traversal" id="toc-get_preorder_traversal" class="nav-link active" data-scroll-target="#get_preorder_traversal">get_preorder_traversal</a></li>
+  <li><a href="#get_graph_edges" id="toc-get_graph_edges" class="nav-link" data-scroll-target="#get_graph_edges">get_graph_edges</a></li>
+  <li><a href="#get_graph" id="toc-get_graph" class="nav-link" data-scroll-target="#get_graph">get_graph</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/ez2rok/recursion-visualizer/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">graph</h1>
+</div>
+
+<div>
+  <div class="description">
+    Recover the graph of recursive functions calls
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>The <a href="https://ez2rok.github.io/recursion-visualizer/recurse.html#recursionvisualizer"><code>RecursionVisualizer</code></a> decorator records several pieces of information:</p>
+<ol type="1">
+<li><code>nodes</code> records all the nodes encountered</li>
+<li><code>history</code> records the time at which each node is first visited and finished being visited</li>
+</ol>
+<p><code>nodes</code> and <code>history</code> capture the graph of recursive function calls but in a convoluted, inaccessible way. (For example, given a node, it is not immediately clear how to use <code>nodes</code> and <code>history</code> to figure out which nodes are its parents.) The functions <a href="https://ez2rok.github.io/recursion-visualizer/graph.html#get_graph"><code>get_graph</code></a> take in <code>nodes</code> and <code>history</code> and return a list of nodes and edges that define the graph of recursive function calls. Specifically, the nodes and edges are represented as a <code>networkx</code> graph object which has many additional helpful features.</p>
+<p>(Technically, <a href="https://ez2rok.github.io/recursion-visualizer/recurse.html#recursionvisualizer"><code>RecursionVisualizer</code></a> records one last piece of information: <code>node_to_edge_labels</code> which maps a node to an edge label. Due to the limited capabilities of the <a href="https://ez2rok.github.io/recursion-visualizer/recurse.html#recursionvisualizer"><code>RecursionVisualizer</code></a> decorator, it is only possible to map an edge label to <em>one</em> of the nodes in the edge. We cannot easily map an edge label to <em>both</em> nodes that make up the edge. The function <a href="https://ez2rok.github.io/recursion-visualizer/graph.html#get_graph"><code>get_graph</code></a> are also responsible for correctly mapping each edge label to the proper edge.)</p>
+<hr>
+<p><a href="https://github.com/ez2rok/recursion-visualizer/blob/master/recursion_visualizer/graph.py#L14" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_preorder_traversal" class="level3">
+<h3 class="anchored" data-anchor-id="get_preorder_traversal">get_preorder_traversal</h3>
+<blockquote class="blockquote">
+<pre><code> get_preorder_traversal (history:List[int])</code></pre>
+</blockquote>
+<p>Extract the preorder traversal from <code>history</code> by recording the order of when each node is first discovered.</p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>history</td>
+<td>List</td>
+<td>list of node ids recording when each node is first visited and finished being visited</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>List</strong></td>
+<td><strong>preorder traversal of the graph</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/ez2rok/recursion-visualizer/blob/master/recursion_visualizer/graph.py#L28" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_graph_edges" class="level3">
+<h3 class="anchored" data-anchor-id="get_graph_edges">get_graph_edges</h3>
+<blockquote class="blockquote">
+<pre><code> get_graph_edges (nodes:Dict[int,recursion_visualizer.node.Node],
+                  preorder:List[int], node_to_edge_labels:Dict[int,str])</code></pre>
+</blockquote>
+<p>Convert the preorder traversal <code>preorder</code> into a list of edges that define the graph of recursive function calls.</p>
+<p>Extract the edges from the preorder traversal by analyzing the depth of each node. Collect all the edges and then map each edges to a string label.</p>
+<p><strong>References:</strong></p>
+<ol type="1">
+<li>Inspired by lee215’s <a href="https://leetcode.com/problems/recover-a-tree-from-preorder-traversal/discuss/274621/JavaC%2B%2BPython-Iterative-Stack-Solution">solution</a> to <em>Leetcode 1028. Recover a Tree From Preorder Traversal</em>.</li>
+</ol>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>nodes</td>
+<td>Dict</td>
+<td>map from node id to node</td>
+</tr>
+<tr class="even">
+<td>preorder</td>
+<td>List</td>
+<td>list of node ids where each node id is recorded when it is first discovered and finished being explored,</td>
+</tr>
+<tr class="odd">
+<td>node_to_edge_labels</td>
+<td>Dict</td>
+<td>map from node id to edge label</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>Dict</strong></td>
+<td><strong>map from an edge to label (an edge is a tuple of two node ids)</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/ez2rok/recursion-visualizer/blob/master/recursion_visualizer/graph.py#L56" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_graph" class="level3">
+<h3 class="anchored" data-anchor-id="get_graph">get_graph</h3>
+<blockquote class="blockquote">
+<pre><code> get_graph (history:List[int],
+            nodes:Dict[int,recursion_visualizer.node.Node],
+            node_to_edge_labels:Dict[tuple,str])</code></pre>
+</blockquote>
+<p>Convert the history of recursive function calls, into a <code>networkx</code> graph of recursive function calls with optionally labeled edges.</p>
+<p>The graph is constructed by 1) extracting the preorder traversal of the graph from <code>history</code> and then 2) extracting the edges of the graph based on the depth of each node in the preorder traversal.</p>
+<table class="table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>history</td>
+<td>List</td>
+<td>list of node ids recording when each node is first visited and finished being visited</td>
+</tr>
+<tr class="even">
+<td>nodes</td>
+<td>Dict</td>
+<td>map from node id to node</td>
+</tr>
+<tr class="odd">
+<td>node_to_edge_labels</td>
+<td>Dict</td>
+<td>map from a node to an edge label</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
